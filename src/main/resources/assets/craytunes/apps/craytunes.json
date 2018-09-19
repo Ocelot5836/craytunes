@@ -3,5 +3,5 @@
 	"author": "Ocelot5836",
 	"description": "A basic application that can play every registered sound event.",
 	"version": "2.0",
-	"icon": "craytunes:textures/apps/icon/craytunes.png"
+	"icon": "craytunes:textures/app/icon/craytunes.png"
 }

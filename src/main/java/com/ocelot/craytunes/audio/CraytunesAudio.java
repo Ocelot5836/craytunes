@@ -1,82 +1,35 @@
 package com.ocelot.craytunes.audio;
 
-import net.minecraft.client.audio.ISound;
-import net.minecraft.client.audio.Sound;
-import net.minecraft.client.audio.SoundEventAccessor;
-import net.minecraft.client.audio.SoundHandler;
+import net.minecraft.client.audio.ITickableSound;
+import net.minecraft.client.audio.PositionedSound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 
-public class CraytunesAudio implements ISound {
+public class CraytunesAudio extends PositionedSound implements ITickableSound {
 
-	@Override
-	public ResourceLocation getSoundLocation() {
-		return null;
+	private boolean isDonePlaying;
+
+	public CraytunesAudio(ResourceLocation sound, float volume) {
+		super(sound, SoundCategory.PLAYERS);
+		this.volume = volume;
+		this.isDonePlaying = false;
 	}
 
 	@Override
-	public SoundEventAccessor createAccessor(SoundHandler handler) {
-		return null;
+	public void update() {
+
 	}
 
 	@Override
-	public Sound getSound() {
-		// TODO Auto-generated method stub
-		return null;
+	public boolean isDonePlaying() {
+		return isDonePlaying;
 	}
 
-	@Override
-	public SoundCategory getCategory() {
-		// TODO Auto-generated method stub
-		return null;
+	public void stop() {
+		this.isDonePlaying = true;
 	}
-
-	@Override
-	public boolean canRepeat() {
-		// TODO Auto-generated method stub
-		return false;
+	
+	public void setVolume(float volume) {
+		this.volume = volume;
 	}
-
-	@Override
-	public int getRepeatDelay() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public float getVolume() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public float getPitch() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public float getXPosF() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public float getYPosF() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public float getZPosF() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public AttenuationType getAttenuationType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

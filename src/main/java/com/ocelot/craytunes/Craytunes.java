@@ -3,7 +3,7 @@ package com.ocelot.craytunes;
 import org.apache.logging.log4j.Logger;
 
 import com.mrcrayfish.device.api.ApplicationManager;
-import com.ocelot.craytunes.apps.ApplicationCrayTunes;
+import com.ocelot.craytunes.apps.craytunes.ApplicationCrayTunes;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
