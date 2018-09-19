@@ -5,9 +5,10 @@ import com.ocelot.craytunes.Craytunes;
 
 import net.minecraft.util.ResourceLocation;
 
+@Deprecated
 public class IdButton extends Button {
 
-	public static final ResourceLocation TEXTURE = new ResourceLocation(Craytunes.MOD_ID, "textures/gui/craytunes.png");
+	public static final ResourceLocation TEXTURE = new ResourceLocation(Craytunes.MOD_ID, "textures/gui/icons.png");
 
 	private int id;
 
