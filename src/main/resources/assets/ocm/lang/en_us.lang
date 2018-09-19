@@ -9,23 +9,6 @@ gui.unbookmark=Unbookmark
 gui.play=Play
 gui.stop=Stop
 
-app.ocm.web_browser.name=Web Browser
-app.ocm.web_browser.author=Ocelot5836
-app.ocm.web_browser.desc=A basic web browser for testing out the cray's api.
-
-app.ocm.web_browser.website.dev=Welcome %s to the web browser! This application will allow you to travel to a few sites that are custom made and are not real at all. Do not think these are all real sites because only a select few work! Try to find all %s site URLs!
-app.ocm.web_browser.button_back.tooltip=Go back to the last site.
-app.ocm.web_browser.button_search.tooltip=Go to the specified site.
-app.ocm.web_browser.button_star.tooltip=Star %s?
-app.ocm.web_browser.button_star_lit.tooltip=Unstar %s?
-
-app.ocm.notestash_plus_plus.name=Notestash++
-app.ocm.notestash_plus_plus.author=Ocelot5836
-app.ocm.notestash_plus_plus.desc=An application aiming to be a better notestash like Notepad++.
-
-app.ocm.craytunes.name=CrayTunes
-app.ocm.craytunes.author=Ocelot5836
-app.ocm.craytunes.desc=A basic application that can play every registered sound event.
 app.ocm.craytunes.tab0=Master
 app.ocm.craytunes.tab1=Music
 app.ocm.craytunes.tab2=Record
