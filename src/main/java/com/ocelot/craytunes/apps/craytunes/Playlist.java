@@ -13,15 +13,22 @@ import net.minecraftforge.common.util.INBTSerializable;
 public class Playlist implements INBTSerializable<NBTTagCompound> {
 
 	private List<SoundTrack> tracks;
+	private String name;
 
 	public Playlist() {
+		this(null);
+	}
+
+	public Playlist(String name) {
 		this.tracks = new ArrayList();
+		this.name = name;
 	}
 
 	@Override
 	public NBTTagCompound serializeNBT() {
 		NBTTagCompound nbt = new NBTTagCompound();
 
+		nbt.setString("name", this.name);
 		NBTTagList tracks = new NBTTagList();
 		for (int i = 0; i < this.tracks.size(); i++) {
 			if (this.tracks.get(i).getSoundLocation() != null) {
@@ -35,6 +42,7 @@ public class Playlist implements INBTSerializable<NBTTagCompound> {
 
 	@Override
 	public void deserializeNBT(NBTTagCompound nbt) {
+		this.name = nbt.getString("name");
 		NBTTagList tracks = nbt.getTagList("tracks", Constants.NBT.TAG_COMPOUND);
 		for (int i = 0; i < tracks.tagCount(); i++) {
 			this.tracks.add(new SoundTrack(new ResourceLocation(tracks.getStringTagAt(i))));
@@ -52,7 +60,11 @@ public class Playlist implements INBTSerializable<NBTTagCompound> {
 	}
 
 	public List<SoundTrack> getTracks() {
-		return this.tracks;
+		return tracks;
+	}
+
+	public String getName() {
+		return name;
 	}
 
 	public SoundTrack get(int currentSound) {
