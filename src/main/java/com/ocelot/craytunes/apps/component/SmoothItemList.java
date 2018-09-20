@@ -116,12 +116,11 @@ public class SmoothItemList<E> extends Component implements Iterable<E> {
 						int renderY = y + i * (this.getCellHeight() + 1);
 						if (renderer != null) {
 							renderer.render(item, this, mc, renderX + 1, renderY + 1 + (int) yOffset, width - 1, 1 + this.getCellHeight(), i == selected);
-							drawHorizontalLine(renderX + 1, renderX + width - 2, renderY + (int) yOffset, innerBorderColor);
 						} else {
 							Gui.drawRect(renderX + 1, renderY + 1 + (int) yOffset, renderX + width - 1, renderY + 1 + (int) yOffset + this.getCellHeight(), i != selected ? backgroundColor : Color.DARK_GRAY.getRGB());
 							RenderUtil.drawStringClipped(String.valueOf(item), renderX + 3, renderY + 3 + (int) yOffset, width - 6, textColor, true);
-							drawHorizontalLine(renderX + 1, renderX + width - 2, renderY + (int) yOffset, innerBorderColor);
 						}
+						drawHorizontalLine(renderX + 1, renderX + width - 2, renderY + (int) yOffset + this.getCellHeight() + 1, innerBorderColor);
 					}
 				}
 			}
