@@ -1,10 +1,13 @@
 package com.ocelot.craytunes.apps.craytunes;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.SoundEventAccessor;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.INBTSerializable;
 
-public class SoundTrack implements INBTSerializable<NBTTagCompound> {
+public class SoundTrack {
 
 	private ResourceLocation soundLocation;
 
@@ -15,26 +18,10 @@ public class SoundTrack implements INBTSerializable<NBTTagCompound> {
 		this.soundLocation = soundLocation;
 	}
 
-	@Override
-	public NBTTagCompound serializeNBT() {
-		NBTTagCompound nbt = new NBTTagCompound();
-		nbt.setString("soundLocation", this.soundLocation.toString());
-		return nbt;
-	}
-
-	@Override
-	public void deserializeNBT(NBTTagCompound nbt) {
-		this.soundLocation = new ResourceLocation(nbt.getString("soundLocation"));
-	}
-
-	public static SoundTrack fromTag(NBTTagCompound nbt) {
-		SoundTrack soundTrack = new SoundTrack();
-		soundTrack.deserializeNBT(nbt);
-		return soundTrack;
-	}
-	
 	public String getName() {
-		return "";
+		SoundEventAccessor accessor = Minecraft.getMinecraft().getSoundHandler().getAccessor(this.soundLocation);
+		String subtitle = accessor == null || accessor.getSubtitle() == null ? null : accessor.getSubtitle().getFormattedText();
+		return subtitle == null ? this.soundLocation.getResourcePath() : subtitle;
 	}
 
 	public ResourceLocation getSoundLocation() {

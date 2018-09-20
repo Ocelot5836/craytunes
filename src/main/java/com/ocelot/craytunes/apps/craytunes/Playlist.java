@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -23,7 +24,9 @@ public class Playlist implements INBTSerializable<NBTTagCompound> {
 
 		NBTTagList tracks = new NBTTagList();
 		for (int i = 0; i < this.tracks.size(); i++) {
-			tracks.appendTag(this.tracks.get(i).serializeNBT());
+			if (this.tracks.get(i).getSoundLocation() != null) {
+				tracks.appendTag(new NBTTagString(this.tracks.get(i).getSoundLocation().toString()));
+			}
 		}
 		nbt.setTag("tracks", tracks);
 
@@ -34,7 +37,7 @@ public class Playlist implements INBTSerializable<NBTTagCompound> {
 	public void deserializeNBT(NBTTagCompound nbt) {
 		NBTTagList tracks = nbt.getTagList("tracks", Constants.NBT.TAG_COMPOUND);
 		for (int i = 0; i < tracks.tagCount(); i++) {
-			this.tracks.add(SoundTrack.fromTag(tracks.getCompoundTagAt(i)));
+			this.tracks.add(new SoundTrack(new ResourceLocation(tracks.getStringTagAt(i))));
 		}
 	}
 
