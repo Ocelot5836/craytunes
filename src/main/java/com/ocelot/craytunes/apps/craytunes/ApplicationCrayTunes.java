@@ -12,6 +12,7 @@ import com.mrcrayfish.device.api.app.Layout;
 import com.mrcrayfish.device.api.app.Layout.Background;
 import com.mrcrayfish.device.api.app.component.Button;
 import com.mrcrayfish.device.api.app.component.Slider;
+import com.mrcrayfish.device.core.Laptop;
 import com.ocelot.api.utils.SoundUtils;
 import com.ocelot.craytunes.apps.component.SmoothItemList;
 import com.ocelot.craytunes.audio.CraytunesAudio;
@@ -22,6 +23,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvent;
 import net.minecraftforge.common.util.Constants;
 
 public class ApplicationCrayTunes extends Application {
@@ -44,6 +46,10 @@ public class ApplicationCrayTunes extends Application {
 	private boolean paused;
 	private float volume;
 
+	private float mouseX;
+	private float mouseY;
+	private boolean loaded;
+
 	@Override
 	public void init(@Nullable NBTTagCompound intent) {
 		mainbg = new Background() {
@@ -53,7 +59,7 @@ public class ApplicationCrayTunes extends Application {
 			}
 		};
 
-		main = new Layout(250, 125);
+		main = new Layout(362, 164);
 		main.setBackground(mainbg);
 
 		this.selectedPlaylist = -1;
@@ -61,18 +67,27 @@ public class ApplicationCrayTunes extends Application {
 		this.paused = false;
 		this.setVolume(1.0F);
 
-		musicList = new SmoothItemList<SoundTrack>(5, 42, main.width - 45, main.height);
-		musicList.setItemClickListener((playlist, index, mouseButton) -> {
-			selectedTrack = index;
-		});
-		main.addComponent(musicList);
+		this.mouseX = 0;
+		this.mouseY = 0;
+		this.loaded = false;
 
-		playlistList = new SmoothItemList<Playlist>(0, 0, 40, main.height);
+		playlistList = new SmoothItemList<Playlist>(0, 0, 80, main.height);
+		playlistList.setScrollSpeed(12);
 		playlistList.setItemClickListener((playlist, index, mouseButton) -> {
 			selectedPlaylist = index;
 			reloadSounds();
 		});
 		main.addComponent(playlistList);
+
+		musicList = new SmoothItemList<SoundTrack>(playlistList.left + playlistList.getWidth() + 5, 42, main.width - playlistList.left - playlistList.getWidth() - 10, main.height - 47);
+		musicList.setScrollSpeed(12);
+		musicList.setItemClickListener((playlist, index, mouseButton) -> {
+			selectedTrack = index;
+			System.out.println(playlistList.left);
+			if (mouseX - playlistList.left + 1 < 20) {
+			}
+		});
+		main.addComponent(musicList);
 
 		mainPlaySound = new Button(main.width - 35, main.height - 25, 30, 16, I18n.format("gui.play"));
 		mainPlaySound.setClickListener((int mouseX, int mouseY, int mouseButton) -> {
@@ -98,7 +113,6 @@ public class ApplicationCrayTunes extends Application {
 		mainVolumeSlider.setSliderColor(new Color(0xEBEBEB));
 		mainVolumeSlider.setSlideListener((percentage) -> {
 			this.setVolume(percentage);
-			markDirty();
 		});
 		main.addComponent(mainVolumeSlider);
 
@@ -137,6 +151,18 @@ public class ApplicationCrayTunes extends Application {
 			mainPause.setVisible(true);
 			SoundUtils.resumeAllSounds();
 		}
+
+		if (!this.loaded) {
+			this.loadDefaults();
+			this.loaded = true;
+		}
+	}
+
+	@Override
+	public void render(Laptop laptop, Minecraft mc, int x, int y, int mouseX, int mouseY, boolean active, float partialTicks) {
+		super.render(laptop, mc, x, y, mouseX, mouseY, active, partialTicks);
+		this.mouseX = mouseX;
+		this.mouseY = mouseY;
 	}
 
 	@Override
@@ -156,9 +182,13 @@ public class ApplicationCrayTunes extends Application {
 	}
 
 	private void loadDefaults() {
+		System.out.println("Load Defaults");
 		Playlist vanilla = new Playlist();
-		// vanilla.add
+		for (SoundEvent sound : SoundEvent.REGISTRY) {
+			vanilla.add(sound.getSoundName());
+		}
 		this.playlistList.addItem(vanilla);
+		this.markDirty();
 	}
 
 	private void setVolume(float volume) {
@@ -167,6 +197,7 @@ public class ApplicationCrayTunes extends Application {
 		if (track != null) {
 			AUDIO.get(track.getSoundLocation()).setVolume(volume);
 		}
+		this.markDirty();
 	}
 
 	private CraytunesAudio playSound(ResourceLocation location) {
@@ -191,8 +222,8 @@ public class ApplicationCrayTunes extends Application {
 	@Override
 	public void save(NBTTagCompound nbt) {
 		nbt.setFloat("volume", volume);
-		nbt.setBoolean("defaults", true);
 
+		System.out.println(this.playlistList.getItems());
 		NBTTagList categories = new NBTTagList();
 		for (Playlist playList : this.playlistList) {
 			categories.appendTag(playList.serializeNBT());
@@ -202,12 +233,10 @@ public class ApplicationCrayTunes extends Application {
 
 	@Override
 	public void load(NBTTagCompound nbt) {
+		loaded = true;
+		System.out.println("Load");
 		volume = nbt.getFloat("volume");
 		mainVolumeSlider.setPercentage(volume);
-
-		if (!nbt.hasKey("defaults", Constants.NBT.TAG_BYTE)) {
-			this.loadDefaults();
-		}
 
 		NBTTagList categories = nbt.getTagList("playlists", Constants.NBT.TAG_COMPOUND);
 		for (int i = 0; i < categories.tagCount(); i++) {
