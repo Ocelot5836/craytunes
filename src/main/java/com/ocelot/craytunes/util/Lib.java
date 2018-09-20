@@ -11,4 +11,10 @@ public class Lib {
 	public static ModContainer getMod(String modId) {
 		return Loader.instance().getIndexedModList().get(modId);
 	}
+	
+	@Nullable
+	public static String getModName(String modId) {
+		ModContainer container = getMod(modId);
+		return container != null ? container.getName() : null;
+	}
 }

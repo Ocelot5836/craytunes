@@ -14,21 +14,31 @@ public class Playlist implements INBTSerializable<NBTTagCompound> {
 
 	private List<SoundTrack> tracks;
 	private String name;
+	private boolean modGenerated;
 
-	public Playlist() {
-		this(null);
+	private Playlist() {
 	}
 
-	public Playlist(String name) {
+	public Playlist(boolean modGenerated) {
+		this(null, modGenerated);
+	}
+
+	public Playlist(String name, boolean modGenerated) {
 		this.tracks = new ArrayList();
 		this.name = name;
+		this.modGenerated = modGenerated;
 	}
 
 	@Override
 	public NBTTagCompound serializeNBT() {
 		NBTTagCompound nbt = new NBTTagCompound();
 
-		nbt.setString("name", this.name);
+		if (this.name != null) {
+			nbt.setString("name", this.name);
+		}
+
+		nbt.setBoolean("modGenerated", this.modGenerated);
+		
 		NBTTagList tracks = new NBTTagList();
 		for (int i = 0; i < this.tracks.size(); i++) {
 			if (this.tracks.get(i).getSoundLocation() != null) {
@@ -42,8 +52,13 @@ public class Playlist implements INBTSerializable<NBTTagCompound> {
 
 	@Override
 	public void deserializeNBT(NBTTagCompound nbt) {
-		this.name = nbt.getString("name");
-		NBTTagList tracks = nbt.getTagList("tracks", Constants.NBT.TAG_COMPOUND);
+		if (nbt.hasKey("name", Constants.NBT.TAG_STRING)) {
+			this.name = nbt.getString("name");
+		}
+		
+		this.modGenerated = nbt.getBoolean("modGenerated");
+
+		NBTTagList tracks = nbt.getTagList("tracks", Constants.NBT.TAG_STRING);
 		for (int i = 0; i < tracks.tagCount(); i++) {
 			this.tracks.add(new SoundTrack(new ResourceLocation(tracks.getStringTagAt(i))));
 		}
@@ -65,6 +80,10 @@ public class Playlist implements INBTSerializable<NBTTagCompound> {
 
 	public String getName() {
 		return name;
+	}
+
+	public boolean isModGenerated() {
+		return modGenerated;
 	}
 
 	public SoundTrack get(int currentSound) {
