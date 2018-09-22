@@ -99,7 +99,7 @@ public class SmoothItemList<E> extends Component implements Iterable<E> {
 		if (this.visible) {
 			int size = this.height / this.getCellHeight();
 
-			Gui.drawRect(x + 1, y + 1, x + width - 1, y + height - 1, Color.LIGHT_GRAY.getRGB());
+			Gui.drawRect(x + 1, y + 1, x + width - 1, y + height - 1, backgroundColor);
 
 			drawHorizontalLine(x, x + width - 1, y, borderColor);
 			drawVerticalLine(x, y, y + height - 1, borderColor);

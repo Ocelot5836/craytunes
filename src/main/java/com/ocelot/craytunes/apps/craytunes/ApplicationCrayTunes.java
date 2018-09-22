@@ -14,7 +14,6 @@ import com.mrcrayfish.device.api.app.Application;
 import com.mrcrayfish.device.api.app.IIcon;
 import com.mrcrayfish.device.api.app.Icons;
 import com.mrcrayfish.device.api.app.Layout;
-import com.mrcrayfish.device.api.app.Layout.Background;
 import com.mrcrayfish.device.api.app.component.Button;
 import com.mrcrayfish.device.api.app.component.Slider;
 import com.mrcrayfish.device.api.app.component.TextField;
@@ -41,8 +40,6 @@ import net.minecraftforge.common.util.Constants;
 
 public class ApplicationCrayTunes extends Application {
 
-	private Background mainbg;
-
 	private Layout main;
 	private List<SoundTrack> musicListCopy;
 	private SmoothItemList<Playlist> playlistList;
@@ -65,15 +62,7 @@ public class ApplicationCrayTunes extends Application {
 
 	@Override
 	public void init(@Nullable NBTTagCompound intent) {
-		mainbg = new Background() {
-			@Override
-			public void render(Gui gui, Minecraft mc, int x, int y, int width, int height, int mouseX, int mouseY, boolean windowActive) {
-				gui.drawRect(x, y, x + main.width, y + main.height, 0xffffffff);
-			}
-		};
-
 		main = new Layout(362, 164);
-		main.setBackground(mainbg);
 
 		this.selectedPlaylist = null;
 		this.playingTrack = null;
@@ -87,6 +76,7 @@ public class ApplicationCrayTunes extends Application {
 		musicListCopy = new ArrayList<SoundTrack>();
 
 		playlistList = new SmoothItemList<Playlist>(0, 0, 80, main.height);
+		playlistList.setBackgroundColor(new Color(Laptop.getSystem().getSettings().getColorScheme().getItemBackgroundColor()));
 		playlistList.setScrollSpeed(25);
 		playlistList.setListItemRenderer(new ListItemRenderer<Playlist>(12) {
 			@Override
@@ -94,7 +84,7 @@ public class ApplicationCrayTunes extends Application {
 				String name = StringUtils.isNullOrEmpty(playlist.getName()) ? "Playlist" : playlist.getName();
 
 				if (selected) {
-					gui.drawRect(x, y, x + width, y + height, 0xff2687FB);
+					gui.drawRect(x, y, x + width, y + height, Laptop.getSystem().getSettings().getColorScheme().itemHighlightColor);
 				}
 
 				RenderUtil.drawStringClipped(name, x + 2, (int) (y + 12f / 2f - (float) mc.fontRenderer.FONT_HEIGHT / 2f) + 1, width - 4, 0xffffffff, false);
@@ -113,6 +103,7 @@ public class ApplicationCrayTunes extends Application {
 		main.addComponent(playlistList);
 
 		musicList = new SmoothItemList<SoundTrack>(playlistList.left + playlistList.getWidth() + 5, 47, main.width - playlistList.left - playlistList.getWidth() - 10, main.height - 52);
+		musicList.setBackgroundColor(new Color(Laptop.getSystem().getSettings().getColorScheme().getItemBackgroundColor()));
 		musicList.setScrollSpeed(50);
 		musicList.setListItemRenderer(new ListItemRenderer<SoundTrack>(18) {
 			@Override
@@ -126,7 +117,7 @@ public class ApplicationCrayTunes extends Application {
 				int fontColor = 0xffffffff;
 
 				if (selected) {
-					gui.drawRect(x, y, x + width, y + height, 0xff2687FB);
+					gui.drawRect(x, y, x + width, y + height, Laptop.getSystem().getSettings().getColorScheme().itemHighlightColor);
 				}
 
 				if (track != null) {
@@ -162,9 +153,12 @@ public class ApplicationCrayTunes extends Application {
 		});
 		musicList.setItemClickListener((track, index, mouseButton) -> {
 			if (mouseX - musicList.xPosition < 20) {
-				this.pause(this.playingTrack == track ? !this.paused : false);
 				if (this.getPlayingTrack() != track) {
+					this.stopPlayingTrack();
+					this.pause(false);
 					this.setPlayingTrack(track);
+				} else {
+					this.pause(!this.paused);
 				}
 			}
 			selectedTrack = track;
@@ -237,7 +231,6 @@ public class ApplicationCrayTunes extends Application {
 	@Override
 	public void onClose() {
 		super.onClose();
-		mainbg = null;
 		main.clear();
 		main = null;
 		this.stopPlayingTrack();
@@ -257,7 +250,7 @@ public class ApplicationCrayTunes extends Application {
 				playlist.add(sound.getSoundName());
 				playlistAll.add(sound.getSoundName());
 			}
-			
+
 		}
 		for (String id : playlists.keySet()) {
 			this.playlistList.addItem(playlists.get(id));

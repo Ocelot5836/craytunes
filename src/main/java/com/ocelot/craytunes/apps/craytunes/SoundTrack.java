@@ -18,12 +18,6 @@ public class SoundTrack {
 		this.soundLocation = soundLocation;
 	}
 
-	public String getName() {
-		SoundEventAccessor accessor = Minecraft.getMinecraft().getSoundHandler().getAccessor(this.soundLocation);
-		String subtitle = accessor == null || accessor.getSubtitle() == null ? null : accessor.getSubtitle().getFormattedText();
-		return subtitle == null ? this.soundLocation.getResourcePath() : subtitle;
-	}
-
 	public ResourceLocation getSoundLocation() {
 		return soundLocation;
 	}
