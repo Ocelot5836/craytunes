@@ -1,37 +1,35 @@
 package com.ocelot.craytunes.audio;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ITickableSound;
-import net.minecraft.client.audio.PositionedSound;
-import net.minecraft.client.audio.SoundHandler;
+import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 
-public class CraytunesAudio extends PositionedSound implements ITickableSound {
+public class CraytunesAudio extends PositionedSoundRecord implements ITickableSound {
 
 	private boolean isDonePlaying;
 
 	public CraytunesAudio(ResourceLocation sound, float volume) {
-		super(sound, SoundCategory.PLAYERS);
-		this.pitch = 1.0F;
-		this.volume = volume;
-		this.isDonePlaying = false;
-		this.repeat = true;
+		super(sound, SoundCategory.PLAYERS, volume, 1.0F, true, 0, AttenuationType.NONE, (float) Minecraft.getMinecraft().player.posX, (float) Minecraft.getMinecraft().player.posY, (float) Minecraft.getMinecraft().player.posZ);
 	}
 
 	@Override
 	public void update() {
+		
 	}
-
-	@Override
-	public boolean isDonePlaying() {
-		return isDonePlaying;
-	}
-
+	
 	public void stop() {
 		this.isDonePlaying = true;
 		this.repeat = false;
 	}
 	
+	@Override
+	public boolean isDonePlaying() {
+		return isDonePlaying;
+	}
+
 	public void setVolume(float volume) {
 		this.volume = volume;
 	}
