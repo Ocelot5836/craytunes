@@ -44,10 +44,10 @@ public class SmoothItemList<E> extends Component implements Iterable<E> {
 
 	protected Layout layoutLoading;
 
-	protected int textColor = Color.WHITE.getRGB();
-	protected int backgroundColor = Color.GRAY.getRGB();
-	protected int borderColor = Color.BLACK.getRGB();
-	protected int innerBorderColor = Color.DARK_GRAY.getRGB();
+	protected int textColor = getColorScheme().textColor;
+	protected int backgroundColor = getColorScheme().getBackgroundColor();
+	protected int borderColor = new Color(getColorScheme().getBackgroundColor()).darker().getRGB();
+	protected int innerBorderColor = borderColor;
 	private static final int LOADING_BACKGROUND = new Color(0F, 0F, 0F, 0.5F).getRGB();
 
 	private Comparator<E> sorter = null;
@@ -201,7 +201,7 @@ public class SmoothItemList<E> extends Component implements Iterable<E> {
 
 	private void scrollDown() {
 		int height = 0;
-		height = this.items.size() * (this.getCellHeight() + 1) - this.height + 2;
+		height = this.items.size() * (this.getCellHeight() + 1) - this.height + 1;
 		for (int i = 0; i < scrollSpeed; i++) {
 			if (offset > -height) {
 				offset--;
