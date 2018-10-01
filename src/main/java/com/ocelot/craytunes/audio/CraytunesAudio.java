@@ -3,7 +3,6 @@ package com.ocelot.craytunes.audio;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ITickableSound;
 import net.minecraft.client.audio.PositionedSoundRecord;
-import net.minecraft.init.SoundEvents;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 
@@ -17,14 +16,14 @@ public class CraytunesAudio extends PositionedSoundRecord implements ITickableSo
 
 	@Override
 	public void update() {
-		
+
 	}
-	
+
 	public void stop() {
 		this.isDonePlaying = true;
 		this.repeat = false;
 	}
-	
+
 	@Override
 	public boolean isDonePlaying() {
 		return isDonePlaying;
@@ -32,5 +31,9 @@ public class CraytunesAudio extends PositionedSoundRecord implements ITickableSo
 
 	public void setVolume(float volume) {
 		this.volume = volume;
+	}
+
+	public void setLoop(boolean loop) {
+		this.repeat = loop;
 	}
 }

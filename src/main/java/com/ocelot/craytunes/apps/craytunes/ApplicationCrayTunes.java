@@ -35,13 +35,11 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.StringUtils;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.util.Constants;
 
 public class ApplicationCrayTunes extends Application {
 
 	private Layout main;
-	private List<SoundTrack> musicListCopy;
 	private SmoothItemList<Playlist> playlistList;
 	private SmoothItemList<SoundTrack> musicList;
 	private Button mainResume;
@@ -57,6 +55,7 @@ public class ApplicationCrayTunes extends Application {
 	private float volume;
 
 	private CraytunesAudio playingAudio;
+	private List<SoundTrack> musicListCopy;
 	private int mouseX;
 	private int mouseY;
 
@@ -70,13 +69,12 @@ public class ApplicationCrayTunes extends Application {
 		this.pause(false);
 		this.setVolume(1.0F);
 
+		this.playingAudio = null;
+		this.musicListCopy = new ArrayList<SoundTrack>();
 		this.mouseX = 0;
 		this.mouseY = 0;
 
-		musicListCopy = new ArrayList<SoundTrack>();
-
 		playlistList = new SmoothItemList<Playlist>(0, 0, 80, main.height);
-		playlistList.setBackgroundColor(new Color(Laptop.getSystem().getSettings().getColorScheme().getItemBackgroundColor()));
 		playlistList.setScrollSpeed(25);
 		playlistList.setListItemRenderer(new ListItemRenderer<Playlist>(12) {
 			@Override
@@ -87,7 +85,7 @@ public class ApplicationCrayTunes extends Application {
 					gui.drawRect(x, y, x + width, y + height, Laptop.getSystem().getSettings().getColorScheme().itemHighlightColor);
 				}
 
-				RenderUtil.drawStringClipped(name, x + 2, (int) (y + 12f / 2f - (float) mc.fontRenderer.FONT_HEIGHT / 2f) + 1, width - 4, 0xffffffff, false);
+				RenderUtil.drawStringClipped(name, x + 2, (int) (y + 12f / 2f - (float) mc.fontRenderer.FONT_HEIGHT / 2f) + 1, width - 4, Laptop.getSystem().getSettings().getColorScheme().getTextColor(), false);
 			}
 		});
 		playlistList.setItemClickListener((playlist, index, mouseButton) -> {
@@ -103,7 +101,6 @@ public class ApplicationCrayTunes extends Application {
 		main.addComponent(playlistList);
 
 		musicList = new SmoothItemList<SoundTrack>(playlistList.left + playlistList.getWidth() + 5, 47, main.width - playlistList.left - playlistList.getWidth() - 10, main.height - 52);
-		musicList.setBackgroundColor(new Color(Laptop.getSystem().getSettings().getColorScheme().getItemBackgroundColor()));
 		musicList.setScrollSpeed(50);
 		musicList.setListItemRenderer(new ListItemRenderer<SoundTrack>(18) {
 			@Override
@@ -114,7 +111,7 @@ public class ApplicationCrayTunes extends Application {
 				selected = track == getSelectedTrack();
 
 				int centerY = (int) (y + 18f / 2f - (float) mc.fontRenderer.FONT_HEIGHT / 2f) + 1;
-				int fontColor = 0xffffffff;
+				int fontColor = Laptop.getSystem().getSettings().getColorScheme().getTextColor();
 
 				if (selected) {
 					gui.drawRect(x, y, x + width, y + height, Laptop.getSystem().getSettings().getColorScheme().itemHighlightColor);
@@ -123,7 +120,7 @@ public class ApplicationCrayTunes extends Application {
 				if (track != null) {
 					ResourceLocation location = track.getSoundLocation();
 					if (location != null) {
-						title = TextFormatting.YELLOW + ("minecraft".equals(location.getResourceDomain()) ? "Minecraft" : Lib.getModName(location.getResourceDomain()));
+						title = "minecraft".equals(location.getResourceDomain()) ? "Minecraft" : Lib.getModName(location.getResourceDomain());
 						name = location.getResourcePath();
 					}
 				}
@@ -144,7 +141,7 @@ public class ApplicationCrayTunes extends Application {
 				}
 
 				if (title != null) {
-					RenderUtil.drawStringClipped(title, x + 20, centerY - mc.fontRenderer.FONT_HEIGHT / 2, width - 22, fontColor, false);
+					RenderUtil.drawStringClipped(title, x + 20, centerY - mc.fontRenderer.FONT_HEIGHT / 2, width - 22, new Color(fontColor).darker().getRGB(), false);
 					RenderUtil.drawStringClipped(name, x + 20, centerY + mc.fontRenderer.FONT_HEIGHT / 2, width - 22, fontColor, false);
 				} else {
 					RenderUtil.drawStringClipped(name, x + 20, centerY, width - 22, fontColor, false);
@@ -167,7 +164,6 @@ public class ApplicationCrayTunes extends Application {
 
 		mainVolumeSlider = new Slider(playlistList.left + playlistList.getWidth() + 30, 6, 100);
 		mainVolumeSlider.setPercentage(this.volume);
-		mainVolumeSlider.setSliderColor(new Color(0xEBEBEB));
 		mainVolumeSlider.setSlideListener((percentage) -> {
 			this.setVolume(percentage);
 		});
@@ -215,10 +211,9 @@ public class ApplicationCrayTunes extends Application {
 	@Override
 	public void onTick() {
 		super.onTick();
-		this.mainResume.setEnabled(this.paused);
-		this.mainResume.setVisible(this.paused);
-		this.mainPause.setEnabled(!this.paused);
-		this.mainPause.setVisible(!this.paused);
+		this.mainResume.setVisible(this.paused && this.selectedPlaylist != null);
+		this.mainPause.setVisible(!this.paused && this.selectedPlaylist != null);
+		this.mainVolumeSlider.setVisible(this.selectedPlaylist != null);
 	}
 
 	@Override
