@@ -14,6 +14,8 @@ public class Lib {
 	
 	@Nullable
 	public static String getModName(String modId) {
+		if("minecraft".equalsIgnoreCase(modId))
+			return "Minecraft";
 		ModContainer container = getMod(modId);
 		return container != null ? container.getName() : null;
 	}

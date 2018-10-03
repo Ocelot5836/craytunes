@@ -3,6 +3,8 @@ package com.ocelot.craytunes.apps.craytunes;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
@@ -17,6 +19,7 @@ public class Playlist implements INBTSerializable<NBTTagCompound> {
 	private boolean modGenerated;
 
 	private Playlist() {
+		this(null, false);
 	}
 
 	public Playlist(boolean modGenerated) {
@@ -37,8 +40,6 @@ public class Playlist implements INBTSerializable<NBTTagCompound> {
 			nbt.setString("name", this.name);
 		}
 
-		nbt.setBoolean("modGenerated", this.modGenerated);
-		
 		NBTTagList tracks = new NBTTagList();
 		for (int i = 0; i < this.tracks.size(); i++) {
 			if (this.tracks.get(i).getSoundLocation() != null) {
@@ -55,8 +56,6 @@ public class Playlist implements INBTSerializable<NBTTagCompound> {
 		if (nbt.hasKey("name", Constants.NBT.TAG_STRING)) {
 			this.name = nbt.getString("name");
 		}
-		
-		this.modGenerated = nbt.getBoolean("modGenerated");
 
 		NBTTagList tracks = nbt.getTagList("tracks", Constants.NBT.TAG_STRING);
 		for (int i = 0; i < tracks.tagCount(); i++) {
@@ -78,6 +77,7 @@ public class Playlist implements INBTSerializable<NBTTagCompound> {
 		return tracks;
 	}
 
+	@Nullable
 	public String getName() {
 		return name;
 	}

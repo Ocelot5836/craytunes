@@ -3,4 +3,17 @@ language.name=English
 language.region=United States
 language.code=en_us
 
-app.ocm.craytunes.search_tracks=Search Tracks...
+# Misc Stuff
+app.craytunes.craytunes.search_tracks=Search Tracks...
+
+# Default Names
+app.craytunes.craytunes.playlist.default=Playlist
+
+# Tooltip Titles
+app.craytunes.craytunes.newPlaylist.tooltip.title=New Playlist
+
+# Tooltips
+app.craytunes.craytunes.newPlaylist.tooltip.desc=Create a new user defined playlist
+
+# Dialogs
+app.craytunes.craytunes.newPlaylist.dialog=Input the name for the new playlist.
