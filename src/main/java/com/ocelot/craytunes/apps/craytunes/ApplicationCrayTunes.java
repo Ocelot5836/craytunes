@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
+import com.mrcrayfish.device.api.app.Alphabet;
 import com.mrcrayfish.device.api.app.Application;
 import com.mrcrayfish.device.api.app.Dialog;
 import com.mrcrayfish.device.api.app.IIcon;
@@ -21,10 +22,8 @@ import com.mrcrayfish.device.api.app.component.TextField;
 import com.mrcrayfish.device.api.app.renderer.ListItemRenderer;
 import com.mrcrayfish.device.api.utils.RenderUtil;
 import com.mrcrayfish.device.core.Laptop;
-import com.mrcrayfish.device.programs.system.SystemApplication;
 import com.ocelot.api.utils.GuiUtils;
 import com.ocelot.api.utils.TextureUtils;
-import com.ocelot.craytunes.Craytunes;
 import com.ocelot.craytunes.apps.component.SmoothItemList;
 import com.ocelot.craytunes.audio.CraytunesAudio;
 import com.ocelot.craytunes.util.Lib;
@@ -53,6 +52,7 @@ public class ApplicationCrayTunes extends Application {
 
 	private TextField musicSearchBar;
 	private Button newPlaylist;
+	private Button addPlaylistTrack;
 
 	private Playlist selectedPlaylist;
 	private SoundTrack playingTrack;
@@ -168,7 +168,7 @@ public class ApplicationCrayTunes extends Application {
 		});
 		this.main.addComponent(musicList);
 
-		this.volumeSlider = new Slider(playlistList.left + playlistList.getWidth() + 50, 6, 100);
+		this.volumeSlider = new Slider(playlistList.left + playlistList.getWidth() + 30, 6, 100);
 		this.volumeSlider.setPercentage(this.volume);
 		this.volumeSlider.setSlideListener((percentage) -> {
 			this.setVolume(percentage);
@@ -191,9 +191,9 @@ public class ApplicationCrayTunes extends Application {
 		this.main.addComponent(musicSearchBar);
 
 		int pauseResumeX = playlistList.left + playlistList.getWidth() + 5;
-		int pauseResumeY = 5;
+		int buttonsY = 5;
 
-		this.resume = new Button(pauseResumeX + 22, pauseResumeY, Icons.PLAY);
+		this.resume = new Button(pauseResumeX, buttonsY, Icons.PLAY);
 		this.resume.setClickListener((mouseX, mouseY, mouseButton) -> {
 			if (mouseButton == 0) {
 				this.pause(false);
@@ -201,7 +201,7 @@ public class ApplicationCrayTunes extends Application {
 		});
 		this.main.addComponent(resume);
 
-		pause = new Button(pauseResumeX + 22, pauseResumeY, Icons.PAUSE);
+		pause = new Button(pauseResumeX, buttonsY, Icons.PAUSE);
 		pause.setClickListener((mouseX, mouseY, mouseButton) -> {
 			if (mouseButton == 0) {
 				this.pause(true);
@@ -209,15 +209,25 @@ public class ApplicationCrayTunes extends Application {
 		});
 		this.main.addComponent(pause);
 
-		this.newPlaylist = new Button(pauseResumeX, pauseResumeY, Icons.PLUS);
-		this.newPlaylist.setToolTip(I18n.format("app." + this.getInfo().getFormattedId() + ".newPlaylist.tooltip.title"), I18n.format("app." + this.getInfo().getFormattedId() + ".newPlaylist.tooltip.desc"));
+		this.newPlaylist = new Button(main.width - 21, buttonsY, Icons.NEW_FOLDER);
+		this.newPlaylist.setToolTip(I18n.format("app." + this.getInfo().getFormattedId() + ".newPlaylist.tooltip.title"), I18n.format("app." + this.getInfo().getFormattedId() + ".newPlaylist.tooltip.subtitle"));
 		this.newPlaylist.setClickListener((mouseX, mouseY, mouseButton) -> {
-			this.openNewPlaylistDialog();
+			if (mouseButton == 0) {
+				this.openNewPlaylistDialog();
+			}
 		});
 		this.main.addComponent(newPlaylist);
 
-		this.setCurrentLayout(main);
+		this.addPlaylistTrack = new Button(main.width - 40, buttonsY, Icons.PLUS);
+		this.addPlaylistTrack.setToolTip(I18n.format("app." + this.getInfo().getFormattedId() + ".addPlaylistTrack.tooltip.title"), I18n.format("app." + this.getInfo().getFormattedId() + ".addPlaylistTrack.tooltip.subtitle"));
+		this.addPlaylistTrack.setClickListener((mouseX, mouseY, mouseButton) -> {
+			if (mouseButton == 0) {
+				this.openAddToCurrentPlaylistDialog();
+			}
+		});
+		this.main.addComponent(addPlaylistTrack);
 
+		this.setCurrentLayout(main);
 		this.loadDefaults();
 	}
 
@@ -227,6 +237,7 @@ public class ApplicationCrayTunes extends Application {
 		this.resume.setVisible(this.paused && this.selectedPlaylist != null);
 		this.pause.setVisible(!this.paused && this.selectedPlaylist != null);
 		this.volumeSlider.setVisible(this.selectedPlaylist != null);
+		this.addPlaylistTrack.setVisible(this.selectedPlaylist != null && !this.selectedPlaylist.isModGenerated());
 	}
 
 	@Override
@@ -251,20 +262,43 @@ public class ApplicationCrayTunes extends Application {
 		this.markDirty();
 	}
 
+	public void addPlaylistTrack(ResourceLocation soundLocation) {
+		if (this.selectedPlaylist != null && !this.selectedPlaylist.isModGenerated()) {
+			this.selectedPlaylist.add(soundLocation);
+			this.reloadSounds();
+			this.markDirty();
+		}
+	}
+
 	public void openNewPlaylistDialog() {
 		Dialog.Input dialog = new Dialog.Input(I18n.format("app." + this.getInfo().getFormattedId() + ".newPlaylist.dialog"));
 		dialog.setResponseHandler((success, input) -> {
-			if (!StringUtils.isNullOrEmpty(input)) {
+			if (success && !StringUtils.isNullOrEmpty(input)) {
 				int id = 0;
 				for (int i = 0; i < this.playlistList.size(); i++) {
 					Playlist playlist = this.playlistList.getItem(i);
-					if (!StringUtils.isNullOrEmpty(playlist.getName()) && playlist.getName().equals(input)) {
+					if (!StringUtils.isNullOrEmpty(playlist.getName()) && (playlist.getName().equals(input)) || playlist.getName().equals(input + " (" + id + ")")) {
 						id++;
 					}
 				}
 
 				this.addPlaylist(id > 0 ? input + " (" + id + ")" : input);
 				return true;
+			}
+			return false;
+		});
+		this.openDialog(dialog);
+	}
+
+	public void openAddToCurrentPlaylistDialog() {
+		Dialog.Input dialog = new Dialog.Input(I18n.format("app." + this.getInfo().getFormattedId() + ".addPlaylistTrack.dialog"));
+		dialog.setResponseHandler((success, input) -> {
+			if (success && !StringUtils.isNullOrEmpty(input)) {
+				ResourceLocation soundLocation = new ResourceLocation(input);
+				if (SoundEvent.REGISTRY.containsKey(soundLocation)) {
+					this.addPlaylistTrack(soundLocation);
+					return true;
+				}
 			}
 			return false;
 		});
@@ -310,10 +344,7 @@ public class ApplicationCrayTunes extends Application {
 			this.playingAudio.stop();
 			this.playingAudio = null;
 		}
-
-		if (this.playingTrack != null) {
-			this.playingTrack = null;
-		}
+		this.playingTrack = null;
 	}
 
 	private void setPlayingTrack(SoundTrack track) {

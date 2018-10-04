@@ -10,10 +10,15 @@ app.craytunes.craytunes.search_tracks=Search Tracks...
 app.craytunes.craytunes.playlist.default=Playlist
 
 # Tooltip Titles
+app.craytunes.craytunes.incomplete.tooltip.title=Incomplete
 app.craytunes.craytunes.newPlaylist.tooltip.title=New Playlist
+app.craytunes.craytunes.addPlaylistTrack.tooltip.title=Add Track
 
 # Tooltips
-app.craytunes.craytunes.newPlaylist.tooltip.desc=Create a new user defined playlist
+app.craytunes.craytunes.incomplete.tooltip.subtitle=This feature is incomplete and will be available in a future release
+app.craytunes.craytunes.newPlaylist.tooltip.subtitle=Create a new user defined playlist
+app.craytunes.craytunes.addPlaylistTrack.tooltip.subtitle=Add a sound event to the current playlist
 
 # Dialogs
 app.craytunes.craytunes.newPlaylist.dialog=Input the name for the new playlist.
+app.craytunes.craytunes.addPlaylistTrack.dialog=Input the resource location of the sound event to add to the playlist.
