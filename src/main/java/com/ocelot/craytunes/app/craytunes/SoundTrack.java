@@ -1,4 +1,4 @@
-package com.ocelot.craytunes.apps.craytunes;
+package com.ocelot.craytunes.app.craytunes;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundEventAccessor;

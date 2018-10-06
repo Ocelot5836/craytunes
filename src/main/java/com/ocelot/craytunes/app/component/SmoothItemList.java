@@ -1,4 +1,4 @@
-package com.ocelot.craytunes.apps.component;
+package com.ocelot.craytunes.app.component;
 
 import java.awt.Color;
 import java.util.Collections;

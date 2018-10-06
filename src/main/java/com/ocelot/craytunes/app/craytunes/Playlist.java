@@ -1,4 +1,4 @@
-package com.ocelot.craytunes.apps.craytunes;
+package com.ocelot.craytunes.app.craytunes;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.ocelot.craytunes.apps.craytunes;
+package com.ocelot.craytunes.app.craytunes;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ import com.mrcrayfish.device.api.utils.RenderUtil;
 import com.mrcrayfish.device.core.Laptop;
 import com.ocelot.api.utils.GuiUtils;
 import com.ocelot.api.utils.TextureUtils;
-import com.ocelot.craytunes.apps.component.SmoothItemList;
+import com.ocelot.craytunes.app.component.SmoothItemList;
 import com.ocelot.craytunes.audio.CraytunesAudio;
 import com.ocelot.craytunes.util.Lib;
 
