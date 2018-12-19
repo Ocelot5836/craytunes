@@ -1,4 +1,4 @@
-package com.ocelot.craytunes.app.craytunes;
+package com.ocelot.craytunes.app;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -25,6 +25,8 @@ import com.mrcrayfish.device.core.Laptop;
 import com.ocelot.api.utils.GuiUtils;
 import com.ocelot.api.utils.TextureUtils;
 import com.ocelot.craytunes.app.component.SmoothItemList;
+import com.ocelot.craytunes.app.craytunes.Playlist;
+import com.ocelot.craytunes.app.craytunes.SoundTrack;
 import com.ocelot.craytunes.audio.CraytunesAudio;
 import com.ocelot.craytunes.util.Lib;
 
@@ -216,7 +218,7 @@ public class ApplicationCrayTunes extends Application {
 				this.openNewPlaylistDialog();
 			}
 		});
-		this.main.addComponent(newPlaylist);
+//		this.main.addComponent(newPlaylist);
 
 		this.addPlaylistTrack = new Button(main.width - 40, buttonsY, Icons.PLUS);
 		this.addPlaylistTrack.setToolTip(I18n.format("app." + this.getInfo().getFormattedId() + ".addPlaylistTrack.tooltip.title"), I18n.format("app." + this.getInfo().getFormattedId() + ".addPlaylistTrack.tooltip.subtitle"));

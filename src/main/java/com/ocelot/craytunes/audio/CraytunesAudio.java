@@ -16,7 +16,6 @@ public class CraytunesAudio extends PositionedSoundRecord implements ITickableSo
 
 	@Override
 	public void update() {
-
 	}
 
 	public void stop() {
