@@ -12,12 +12,16 @@ app.craytunes.craytunes.playlist.default=Playlist
 # Tooltip Titles
 app.craytunes.craytunes.incomplete.tooltip.title=Incomplete
 app.craytunes.craytunes.newPlaylist.tooltip.title=New Playlist
+app.craytunes.craytunes.deletePlaylist.tooltip.title=Delete Playlist
 app.craytunes.craytunes.addPlaylistTrack.tooltip.title=Add Track
+app.craytunes.craytunes.removePlaylistTrack.tooltip.title=Remove Track
 
 # Tooltips
 app.craytunes.craytunes.incomplete.tooltip.subtitle=This feature is incomplete and will be available in a future release
 app.craytunes.craytunes.newPlaylist.tooltip.subtitle=Create a new user defined playlist
+app.craytunes.craytunes.deletePlaylist.tooltip.subtitle=Deletes the currently selected playlist
 app.craytunes.craytunes.addPlaylistTrack.tooltip.subtitle=Add a sound event to the current playlist
+app.craytunes.craytunes.removePlaylistTrack.tooltip.subtitle=Removes the selected track from the playlist
 
 # Dialogs
 app.craytunes.craytunes.newPlaylist.dialog=Input the name for the new playlist.

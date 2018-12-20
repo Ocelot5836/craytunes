@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-import com.mrcrayfish.device.api.app.Alphabet;
 import com.mrcrayfish.device.api.app.Application;
 import com.mrcrayfish.device.api.app.Dialog;
 import com.mrcrayfish.device.api.app.IIcon;
@@ -24,6 +23,7 @@ import com.mrcrayfish.device.api.utils.RenderUtil;
 import com.mrcrayfish.device.core.Laptop;
 import com.ocelot.api.utils.GuiUtils;
 import com.ocelot.api.utils.TextureUtils;
+import com.ocelot.craytunes.Craytunes;
 import com.ocelot.craytunes.app.component.SmoothItemList;
 import com.ocelot.craytunes.app.craytunes.Playlist;
 import com.ocelot.craytunes.app.craytunes.SoundTrack;
@@ -54,7 +54,9 @@ public class ApplicationCrayTunes extends Application {
 
 	private TextField musicSearchBar;
 	private Button newPlaylist;
+	private Button deletePlaylist;
 	private Button addPlaylistTrack;
+	private Button removePlaylistTrack;
 
 	private Playlist selectedPlaylist;
 	private SoundTrack playingTrack;
@@ -97,7 +99,7 @@ public class ApplicationCrayTunes extends Application {
 			}
 		});
 		this.playlistList.setItemClickListener((playlist, index, mouseButton) -> {
-			if (this.getCurrentPlaylist() != playlist) {
+			if (this.selectedPlaylist != playlist) {
 				this.pause(true);
 				this.selectedTrack = null;
 				this.selectedPlaylist = playlist;
@@ -106,7 +108,7 @@ public class ApplicationCrayTunes extends Application {
 				this.reloadSounds();
 			}
 		});
-		this.main.addComponent(playlistList);
+		this.main.addComponent(this.playlistList);
 
 		this.musicList = new SmoothItemList<SoundTrack>(playlistList.left + playlistList.getWidth() + 5, 47, main.width - playlistList.left - playlistList.getWidth() - 10, main.height - 52);
 		this.musicList.setScrollSpeed(50);
@@ -115,8 +117,8 @@ public class ApplicationCrayTunes extends Application {
 			public void render(SoundTrack track, Gui gui, Minecraft mc, int x, int y, int width, int height, boolean selected) {
 				String title = null;
 				String name = "null";
-				boolean playing = track == getPlayingTrack();
-				selected = track == getSelectedTrack();
+				boolean playing = track == playingTrack;
+				selected = track == selectedTrack;
 
 				int centerY = (int) (y + 18f / 2f - (float) mc.fontRenderer.FONT_HEIGHT / 2f) + 1;
 				int fontColor = Laptop.getSystem().getSettings().getColorScheme().getTextColor();
@@ -134,7 +136,7 @@ public class ApplicationCrayTunes extends Application {
 				}
 
 				GlStateManager.color(1, 1, 1, 1);
-				TextureUtils.bindTexture("textures/misc/unknown_pack.png");
+				track.bindIconLocation();
 				gui.drawScaledCustomSizeModalRect(x + 2, y + 2, 0, 0, 256, 256, 14, 14, 256, 256);
 
 				if (GuiUtils.isMouseInside(musicList.xPosition, musicList.yPosition, musicList.getWidth(), musicList.getHeight(), mouseX, mouseY) && GuiUtils.isMouseInside(x, y, 18, 18, mouseX, mouseY)) {
@@ -157,8 +159,8 @@ public class ApplicationCrayTunes extends Application {
 			}
 		});
 		this.musicList.setItemClickListener((track, index, mouseButton) -> {
-			if (mouseX - musicList.xPosition < 20) {
-				if (this.getPlayingTrack() != track) {
+			if (this.mouseX - this.musicList.xPosition < 20) {
+				if (this.playingTrack != track) {
 					this.stopPlayingTrack();
 					this.pause(false);
 					this.setPlayingTrack(track);
@@ -166,11 +168,11 @@ public class ApplicationCrayTunes extends Application {
 					this.pause(!this.paused);
 				}
 			}
-			selectedTrack = track;
+			this.selectedTrack = track;
 		});
-		this.main.addComponent(musicList);
+		this.main.addComponent(this.musicList);
 
-		this.volumeSlider = new Slider(playlistList.left + playlistList.getWidth() + 30, 6, 100);
+		this.volumeSlider = new Slider(this.playlistList.left + this.playlistList.getWidth() + 30, 6, 100);
 		this.volumeSlider.setPercentage(this.volume);
 		this.volumeSlider.setSlideListener((percentage) -> {
 			this.setVolume(percentage);
@@ -180,19 +182,19 @@ public class ApplicationCrayTunes extends Application {
 		this.musicSearchBar = new TextField(musicList.left, musicList.top - 16 - 5, musicList.getWidth());
 		this.musicSearchBar.setPlaceholder(I18n.format("app." + ApplicationCrayTunes.this.getInfo().getFormattedId() + ".search_tracks"));
 		this.musicSearchBar.setKeyListener((c) -> {
-			String text = musicSearchBar.getText();
+			String text = this.musicSearchBar.getText();
 			if (!StringUtils.isNullOrEmpty(text)) {
 				Predicate<SoundTrack> filter = track -> org.apache.commons.lang3.StringUtils.containsIgnoreCase(track.getSoundLocation().getResourceDomain(), text) || org.apache.commons.lang3.StringUtils.containsIgnoreCase(track.getSoundLocation().getResourcePath(), text) || org.apache.commons.lang3.StringUtils.containsIgnoreCase(track.getSoundLocation().toString(), text) || org.apache.commons.lang3.StringUtils.containsIgnoreCase(("minecraft".equals(track.getSoundLocation().getResourceDomain()) ? "Minecraft" : Lib.getModName(track.getSoundLocation().getResourceDomain())), text);
 				List<SoundTrack> filteredItems = this.musicListCopy.stream().filter(filter).collect(Collectors.toList());
-				musicList.setItems(filteredItems);
+				this.musicList.setItems(filteredItems);
 			} else {
-				musicList.setItems(musicListCopy);
+				this.musicList.setItems(this.musicListCopy);
 			}
 			return false;
 		});
-		this.main.addComponent(musicSearchBar);
+		this.main.addComponent(this.musicSearchBar);
 
-		int pauseResumeX = playlistList.left + playlistList.getWidth() + 5;
+		int pauseResumeX = this.playlistList.left + this.playlistList.getWidth() + 5;
 		int buttonsY = 5;
 
 		this.resume = new Button(pauseResumeX, buttonsY, Icons.PLAY);
@@ -201,15 +203,15 @@ public class ApplicationCrayTunes extends Application {
 				this.pause(false);
 			}
 		});
-		this.main.addComponent(resume);
+		this.main.addComponent(this.resume);
 
-		pause = new Button(pauseResumeX, buttonsY, Icons.PAUSE);
-		pause.setClickListener((mouseX, mouseY, mouseButton) -> {
+		this.pause = new Button(pauseResumeX, buttonsY, Icons.PAUSE);
+		this.pause.setClickListener((mouseX, mouseY, mouseButton) -> {
 			if (mouseButton == 0) {
 				this.pause(true);
 			}
 		});
-		this.main.addComponent(pause);
+		this.main.addComponent(this.pause);
 
 		this.newPlaylist = new Button(main.width - 21, buttonsY, Icons.NEW_FOLDER);
 		this.newPlaylist.setToolTip(I18n.format("app." + this.getInfo().getFormattedId() + ".newPlaylist.tooltip.title"), I18n.format("app." + this.getInfo().getFormattedId() + ".newPlaylist.tooltip.subtitle"));
@@ -218,18 +220,36 @@ public class ApplicationCrayTunes extends Application {
 				this.openNewPlaylistDialog();
 			}
 		});
-//		this.main.addComponent(newPlaylist);
+		// this.main.addComponent(this.newPlaylist);
 
-		this.addPlaylistTrack = new Button(main.width - 40, buttonsY, Icons.PLUS);
+		this.deletePlaylist = new Button(main.width - 40, buttonsY, Icons.TRASH);
+		this.deletePlaylist.setToolTip(I18n.format("app." + this.getInfo().getFormattedId() + ".deletePlaylist.tooltip.title"), I18n.format("app." + this.getInfo().getFormattedId() + ".deletePlaylist.tooltip.subtitle"));
+		this.deletePlaylist.setClickListener((mouseX, mouseY, mouseButton) -> {
+			if (mouseButton == 0 && this.selectedPlaylist != null) {
+				this.removePlaylist(this.selectedPlaylist);
+			}
+		});
+		// this.main.addComponent(this.deletePlaylist);
+
+		this.addPlaylistTrack = new Button(main.width - 59, buttonsY, Icons.PLUS);
 		this.addPlaylistTrack.setToolTip(I18n.format("app." + this.getInfo().getFormattedId() + ".addPlaylistTrack.tooltip.title"), I18n.format("app." + this.getInfo().getFormattedId() + ".addPlaylistTrack.tooltip.subtitle"));
 		this.addPlaylistTrack.setClickListener((mouseX, mouseY, mouseButton) -> {
 			if (mouseButton == 0) {
 				this.openAddToCurrentPlaylistDialog();
 			}
 		});
-		this.main.addComponent(addPlaylistTrack);
+		this.main.addComponent(this.addPlaylistTrack);
 
-		this.setCurrentLayout(main);
+		this.removePlaylistTrack = new Button(main.width - 78, buttonsY, Icons.CROSS);
+		this.removePlaylistTrack.setToolTip(I18n.format("app." + this.getInfo().getFormattedId() + ".removePlaylistTrack.tooltip.title"), I18n.format("app." + this.getInfo().getFormattedId() + ".removePlaylistTrack.tooltip.subtitle"));
+		this.removePlaylistTrack.setClickListener((mouseX, mouseY, mouseButton) -> {
+			if (mouseButton == 0 && this.selectedPlaylist != null && this.selectedTrack != null) {
+				this.removeTrack(this.selectedPlaylist, this.selectedTrack);
+			}
+		});
+		this.main.addComponent(this.removePlaylistTrack);
+
+		this.setCurrentLayout(this.main);
 		this.loadDefaults();
 	}
 
@@ -239,7 +259,10 @@ public class ApplicationCrayTunes extends Application {
 		this.resume.setVisible(this.paused && this.selectedPlaylist != null);
 		this.pause.setVisible(!this.paused && this.selectedPlaylist != null);
 		this.volumeSlider.setVisible(this.selectedPlaylist != null);
+		this.deletePlaylist.setEnabled(this.selectedPlaylist != null && !this.selectedPlaylist.isModGenerated());
 		this.addPlaylistTrack.setVisible(this.selectedPlaylist != null && !this.selectedPlaylist.isModGenerated());
+		this.removePlaylistTrack.setVisible(this.selectedPlaylist != null && !this.selectedPlaylist.isModGenerated());
+		this.removePlaylistTrack.setEnabled(this.selectedTrack != null);
 	}
 
 	@Override
@@ -259,7 +282,7 @@ public class ApplicationCrayTunes extends Application {
 	}
 
 	public void addPlaylist(String name) {
-		Playlist playlist = new Playlist(name, false);
+		Playlist playlist = new Playlist(name, null);
 		this.playlistList.addItem(playlist);
 		this.markDirty();
 	}
@@ -307,15 +330,36 @@ public class ApplicationCrayTunes extends Application {
 		this.openDialog(dialog);
 	}
 
+	public void removePlaylist(Playlist playlist) {
+		if (playlist != null) {
+			for (SoundTrack track : playlist.getTracks()) {
+				this.removeTrack(playlist, track);
+			}
+			this.playlistList.getItems().remove(playlist);
+			playlist = null;
+			this.markDirty();
+		}
+	}
+
+	public void removeTrack(Playlist playlist, SoundTrack track) {
+		if (playlist != null && track != null) {
+			if (this.playingTrack == track)
+				this.stopPlayingTrack();
+			playlist.remove(track);
+			track = null;
+			this.markDirty();
+		}
+	}
+
 	private void loadDefaults() {
 		Map<String, Playlist> playlists = new HashMap<String, Playlist>();
-		Playlist playlistAll = new Playlist("All", true);
+		Playlist playlistAll = new Playlist("All", Craytunes.MOD_ID + ".all");
 		for (SoundEvent sound : SoundEvent.REGISTRY) {
 			ResourceLocation name = sound.getSoundName();
 			if (name != null) {
 				Playlist playlist = playlists.get(name.getResourceDomain());
 				if (playlist == null) {
-					playlist = new Playlist(Lib.getModName(name.getResourceDomain()), true);
+					playlist = new Playlist(Lib.getModName(name.getResourceDomain()), name.getResourceDomain());
 					playlists.put(name.getResourceDomain(), playlist);
 				}
 				playlist.add(sound.getSoundName());
@@ -330,12 +374,11 @@ public class ApplicationCrayTunes extends Application {
 	}
 
 	private void reloadSounds() {
-		Playlist playlist = this.getCurrentPlaylist();
-		if (playlist != null) {
-			musicListCopy.clear();
-			musicList.removeAll();
-			musicListCopy.addAll(playlist.getTracks());
-			musicList.setItems(playlist.getTracks());
+		if (this.selectedPlaylist != null) {
+			this.musicListCopy.clear();
+			this.musicList.removeAll();
+			this.musicListCopy.addAll(this.selectedPlaylist.getTracks());
+			this.musicList.setItems(this.selectedPlaylist.getTracks());
 		}
 
 		this.stopPlayingTrack();
@@ -379,21 +422,6 @@ public class ApplicationCrayTunes extends Application {
 	private void playSound(ResourceLocation location) {
 		this.playingAudio = new CraytunesAudio(location, this.volume);
 		Minecraft.getMinecraft().getSoundHandler().playSound(this.playingAudio);
-	}
-
-	@Nullable
-	private Playlist getCurrentPlaylist() {
-		return this.selectedPlaylist == null ? null : this.selectedPlaylist;
-	}
-
-	@Nullable
-	private SoundTrack getPlayingTrack() {
-		return this.playingTrack == null ? null : this.playingTrack;
-	}
-
-	@Nullable
-	private SoundTrack getSelectedTrack() {
-		return this.selectedTrack == null ? null : this.selectedTrack;
 	}
 
 	@Override
